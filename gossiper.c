@@ -8,10 +8,10 @@
 #include <unistd.h>
 
 // Broadcast out existence every so often.
-static const int WHISPER_DELAY_SEC = 10;
-static const int GOSSIP_NAME_LEN = 20;
-static const char *PORT = "1337";
-static const int PORT_NUM = 1337;
+#define WHISPER_DELAY_SEC 10
+#define GOSSIP_NAME_LEN 20
+#define PORT "1337"
+#define PORT_NUM 1337
 
 static char *gossip_name = NULL;
 
@@ -50,6 +50,7 @@ void hear_whisper(int sockfd)
    int rv;
    socklen_t addrlen;
    struct sockaddr_in s;
+   static int count = 0;
 
    // The broadcast address.
    memset(&s, 0, sizeof(struct sockaddr_in));
@@ -64,7 +65,7 @@ void hear_whisper(int sockfd)
       perror("recvfrom");
    else {
       if (strncmp(gossip_name, (char *)packet.name, strlen(gossip_name)) != 0)
-         printf("whisper from %s\n", packet.name);
+         printf("[%d] whisper from %s\n", count++, packet.name);
       else
          fprintf(stderr, "ignoring packet from myself\n");
    }
@@ -85,8 +86,6 @@ void gossip(int sockfd)
       FD_SET(STDIN_FILENO, &readfds);
 
       diff = time(NULL) - last_whisper;
-      printf("diff = %ld\ttime = %ld\n", diff, time(NULL));
-      printf("\t\tlast = %ld\n", last_whisper);
       if (diff >= WHISPER_DELAY_SEC) {
          // Timeout instantly. Or just whisper now...
          timeout.tv_sec = 0;

@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -Werror -pipe -fcatch-undefined-behavior -ftrapv -g
+CFLAGS = -Wall -Wextra -Werror -pipe -ftrapv
 
 all:
 	$(CC) $(CFLAGS) -o gossip gossiper.c
